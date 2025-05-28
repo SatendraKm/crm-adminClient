@@ -8,6 +8,8 @@ import {
   // Settings,
   X,
   Home,
+  MapPin,
+  Megaphone,
   // BarChart3,
   // FileText,
   // Bell,
@@ -54,8 +56,20 @@ export default function AdminSidebar({ collapsed = false, close }: Props) {
     {
       path: '/admin/employees',
       icon: Users,
-      label: 'employees',
+      label: 'Employees',
       color: 'text-purple-600',
+    },
+    {
+      path: '/admin/regions',
+      icon: MapPin,
+      label: 'Regions',
+      color: 'text-green-600',
+    },
+    {
+      path: '/admin/campaigns',
+      icon: Megaphone,
+      label: 'Campaigns',
+      color: 'text-red-600',
     },
     // {
     //   path: '/admin/content',

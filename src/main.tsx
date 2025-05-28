@@ -9,7 +9,7 @@ import { PersistGate } from 'redux-persist/integration/react';
 import { persistor } from './redux/store.ts';
 
 // Set theme on html element
-document.documentElement.setAttribute('data-theme', 'cmyk');
+document.documentElement.setAttribute('data-theme', 'nord');
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

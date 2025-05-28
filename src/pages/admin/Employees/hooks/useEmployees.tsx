@@ -5,7 +5,7 @@ import type {
   FilterOptions,
   EmployeeFilters,
   EmployeeResponse,
-} from '../types/employee';
+} from '../types/EmployeeTypes';
 
 export const useEmployees = (filters: EmployeeFilters) => {
   const [employees, setEmployees] = useState<Employee[]>([]);
@@ -46,10 +46,20 @@ export const useEmployees = (filters: EmployeeFilters) => {
         page: filters.page.toString(),
         limit: limit.toString(),
         search: filters.search,
-        status: filters.filterActive,
-        role: filters.filterRole,
-        region: filters.filterRegion,
       });
+
+      if (filters.filterActive !== 'All') {
+        params.append('is_active', filters.filterActive);
+      }
+
+      if (filters.filterRole !== 'All') {
+        params.append('role', filters.filterRole);
+      }
+
+      if (filters.filterRegion !== 'All') {
+        params.append('region', filters.filterRegion);
+      }
+      console.log(params.toString());
 
       const res = await axiosInstance.get<EmployeeResponse>(
         `/api/admin/employees?${params}`,

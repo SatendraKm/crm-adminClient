@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import type { EmployeeFilters } from '../types/employee';
+import type { EmployeeFilters } from '../types/EmployeeTypes';
 
 export const useEmployeeFilters = () => {
   const [search, setSearch] = useState('');
@@ -19,6 +19,10 @@ export const useEmployeeFilters = () => {
 
     return () => clearTimeout(timer);
   }, [search]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [debouncedSearch]);
 
   const resetFilters = () => {
     setSearch('');
