@@ -11,4 +11,7 @@ export interface Region {
 export interface RegionApiResponse {
   success: boolean;
   data: Region[];
+  total?: number;
+  currentPage?: number;
+  totalPages?: number;
 }

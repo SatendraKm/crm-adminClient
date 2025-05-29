@@ -1,39 +1,182 @@
 // pages/RegionsPage.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import type { Region } from './types/RegionTypes';
 import { regionService } from './services/regionService';
 import RegionTable from './components/RegionTable';
+import RegionFilters from './components/RegionFilters';
+import Pagination from './components/Pagination';
+import StatusEditModal from './components/StatusEditModal';
+
+export interface FilterState {
+  EmployeeName: string;
+  role: string;
+  Project: string;
+  is_active: string;
+}
+
+export interface PaginationState {
+  currentPage: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
 
 const Regions: React.FC = () => {
   const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchRegions = async () => {
-    try {
-      setLoading(true);
-      setError(null);
-      const response = await regionService.getRegions();
+  // Modal state
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Region | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
 
-      if (response.success) {
-        setRegions(response.data);
-      } else {
-        setError('Failed to fetch regions data');
+  // Filter state
+  const [filters, setFilters] = useState<FilterState>({
+    EmployeeName: '',
+    role: '',
+    Project: '',
+    is_active: '',
+  });
+
+  // Pagination state
+  const [pagination, setPagination] = useState<PaginationState>({
+    currentPage: 1,
+    limit: 10,
+    total: 0,
+    totalPages: 0,
+  });
+
+  const fetchRegions = useCallback(
+    async (resetPagination = false) => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const queryParams = {
+          page: resetPagination ? 1 : pagination.currentPage,
+          limit: pagination.limit,
+          ...Object.fromEntries(
+            Object.entries(filters).filter(([, value]) => value !== ''),
+          ),
+        };
+
+        const response = await regionService.getRegions(queryParams);
+
+        if (response.success) {
+          setRegions(response.data);
+          setPagination((prev) => ({
+            ...prev,
+            currentPage: resetPagination ? 1 : prev.currentPage,
+            total: response.total || 0,
+            totalPages: response.totalPages || 0,
+          }));
+        } else {
+          setError('Failed to fetch regions data');
+        }
+      } catch (err) {
+        setError('Error loading regions data. Please try again.');
+        console.error('Error fetching regions:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      setError('Error loading regions data. Please try again.');
-      console.error('Error fetching regions:', err);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [filters, pagination.currentPage, pagination.limit],
+  );
 
   useEffect(() => {
     fetchRegions();
-  }, []);
+  }, [fetchRegions]);
 
   const handleRefresh = () => {
     fetchRegions();
+  };
+
+  const handleFilterChange = (newFilters: Partial<FilterState>) => {
+    setFilters((prev) => ({ ...prev, ...newFilters }));
+  };
+
+  const handleApplyFilters = () => {
+    fetchRegions(true); // Reset to page 1 when applying filters
+  };
+
+  const handleClearFilters = () => {
+    setFilters({
+      EmployeeName: '',
+      role: '',
+      Project: '',
+      is_active: '',
+    });
+    // Fetch will be triggered by useEffect due to filters change
+  };
+
+  const handlePageChange = (page: number) => {
+    setPagination((prev) => ({ ...prev, currentPage: page }));
+  };
+
+  const handleLimitChange = (limit: number) => {
+    setPagination((prev) => ({
+      ...prev,
+      limit,
+      currentPage: 1, // Reset to first page when changing limit
+    }));
+  };
+
+  // Status editing handlers
+  const handleEditStatus = (employee: Region) => {
+    setSelectedEmployee(employee);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedEmployee(null);
+  };
+
+  const handleConfirmStatusUpdate = async (
+    employeeId: string,
+    newStatus: 'Active' | 'Inactive',
+  ) => {
+    try {
+      setIsUpdatingStatus(true);
+
+      const response = await regionService.updateEmployeeStatus(
+        employeeId,
+        newStatus,
+      );
+
+      if (response.success) {
+        // Update the region in the current list
+        setRegions((prev) =>
+          prev.map((region) =>
+            region.EmployeeId === employeeId
+              ? { ...region, is_active: newStatus }
+              : region,
+          ),
+        );
+
+        // Show success message (you can use toast notification here)
+        setError(null);
+
+        // Close modal
+        handleCloseModal();
+
+        // Optional: Show success toast
+        console.log('Status updated successfully:', response.message);
+      } else {
+        setError(response.message || 'Failed to update status');
+      }
+    } catch (err) {
+      console.error('Error updating status:', err);
+      setError('Failed to update employee status. Please try again.');
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  // Get unique values for filter dropdowns
+  const getUniqueProjects = () => {
+    return [...new Set(regions.map((r) => r.Project))].filter(Boolean);
   };
 
   return (
@@ -83,10 +226,16 @@ const Regions: React.FC = () => {
 
       {/* Stats Cards */}
       {!loading && !error && (
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
           <div className="stat bg-base-100 rounded-box shadow">
-            <div className="stat-title">Total Regions</div>
-            <div className="stat-value text-primary">{regions.length}</div>
+            <div className="stat-title">Total Records</div>
+            <div className="stat-value text-primary">{pagination.total}</div>
+          </div>
+          <div className="stat bg-base-100 rounded-box shadow">
+            <div className="stat-title">Current Page</div>
+            <div className="stat-value text-info">
+              {pagination.currentPage} / {pagination.totalPages}
+            </div>
           </div>
           <div className="stat bg-base-100 rounded-box shadow">
             <div className="stat-title">Active Regions</div>
@@ -97,11 +246,21 @@ const Regions: React.FC = () => {
           <div className="stat bg-base-100 rounded-box shadow">
             <div className="stat-title">Projects</div>
             <div className="stat-value text-secondary">
-              {new Set(regions.map((r) => r.Project)).size}
+              {getUniqueProjects().length}
             </div>
           </div>
         </div>
       )}
+
+      {/* Filters */}
+      <RegionFilters
+        filters={filters}
+        onFilterChange={handleFilterChange}
+        onApplyFilters={handleApplyFilters}
+        onClearFilters={handleClearFilters}
+        projects={getUniqueProjects()}
+        loading={loading}
+      />
 
       {/* Error Alert */}
       {error && (
@@ -128,14 +287,56 @@ const Regions: React.FC = () => {
       )}
 
       {/* Table Card */}
-      <div className="card bg-base-100 shadow-xl">
+      <div className="card bg-base-100 shadow-xl mb-6">
         <div className="card-body">
-          <div className="card-title">
-            <h2 className="text-xl font-semibold">Regions Data</h2>
+          <div className="flex justify-between items-center mb-4">
+            <h2 className="card-title text-xl font-semibold">Regions Data</h2>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-gray-600">Show:</span>
+              <select
+                className="select select-bordered select-sm"
+                value={pagination.limit}
+                onChange={(e) => handleLimitChange(Number(e.target.value))}
+                disabled={loading}
+              >
+                <option value={5}>5</option>
+                <option value={10}>10</option>
+                <option value={25}>25</option>
+                <option value={50}>50</option>
+              </select>
+              <span className="text-sm text-gray-600">per page</span>
+            </div>
           </div>
-          <RegionTable regions={regions} loading={loading} />
+
+          <RegionTable
+            regions={regions}
+            loading={loading}
+            onEditStatus={handleEditStatus}
+          />
+
+          {/* Pagination */}
+          {!loading && !error && pagination.totalPages > 1 && (
+            <div className="mt-6">
+              <Pagination
+                currentPage={pagination.currentPage}
+                totalPages={pagination.totalPages}
+                onPageChange={handlePageChange}
+                total={pagination.total}
+                limit={pagination.limit}
+              />
+            </div>
+          )}
         </div>
       </div>
+
+      {/* Status Edit Modal */}
+      <StatusEditModal
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        employee={selectedEmployee}
+        onConfirm={handleConfirmStatusUpdate}
+        loading={isUpdatingStatus}
+      />
     </div>
   );
 };
