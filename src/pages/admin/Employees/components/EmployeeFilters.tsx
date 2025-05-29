@@ -1,4 +1,5 @@
-import React from 'react';
+import React, { useState } from 'react';
+import axiosInstance from '../../../../lib/axios';
 import { truncateText } from '../utils/employeeUtils';
 
 interface EmployeeFiltersProps {
@@ -17,6 +18,158 @@ interface EmployeeFiltersProps {
   totalEmployees: number;
 }
 
+const AddEmployeeModal: React.FC<{
+  open: boolean;
+  onClose: () => void;
+}> = ({ open, onClose }) => {
+  const [form, setForm] = useState({
+    EmployeeId: '',
+    EmployeePhone: '',
+    EmployeeName: '',
+    EmployeeRoleID: '',
+    EmployeeMailId: '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+    setLoading(true);
+    try {
+      const res = await axiosInstance.post('/api/admin/employees', {
+        EmployeeId: Number(form.EmployeeId),
+        EmployeePhone: form.EmployeePhone,
+        EmployeeName: form.EmployeeName,
+        EmployeeRoleID: Number(form.EmployeeRoleID),
+        EmployeeMailId: form.EmployeeMailId,
+      });
+      if (res.data.success) {
+        setSuccessMsg(res.data.message || 'Employee created successfully');
+        setTimeout(() => {
+          onClose();
+          setSuccessMsg('');
+        }, 1000);
+      } else {
+        setError(res.data.message || 'Failed to create employee');
+      }
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message ||
+          err.message ||
+          'Failed to create employee',
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (!open) return null;
+
+  return (
+    <div className="modal modal-open">
+      <div className="modal-box max-w-md">
+        <div className="flex justify-between items-center mb-4">
+          <h3 className="font-bold text-lg">Add New Employee</h3>
+          <button
+            className="btn btn-sm btn-circle btn-ghost"
+            onClick={onClose}
+            disabled={loading}
+          >
+            ✕
+          </button>
+        </div>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <input
+            name="EmployeeId"
+            type="number"
+            className="input input-bordered w-full"
+            placeholder="Employee ID"
+            value={form.EmployeeId}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+          <input
+            name="EmployeeName"
+            type="text"
+            className="input input-bordered w-full"
+            placeholder="Employee Name"
+            value={form.EmployeeName}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+          <input
+            name="EmployeePhone"
+            type="text"
+            className="input input-bordered w-full"
+            placeholder="Phone"
+            value={form.EmployeePhone}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+          <input
+            name="EmployeeRoleID"
+            type="number"
+            className="input input-bordered w-full"
+            placeholder="Role ID"
+            value={form.EmployeeRoleID}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+          <input
+            name="EmployeeMailId"
+            type="email"
+            className="input input-bordered w-full"
+            placeholder="Email"
+            value={form.EmployeeMailId}
+            onChange={handleChange}
+            required
+            disabled={loading}
+          />
+          {error && <div className="alert alert-error py-2">{error}</div>}
+          {successMsg && (
+            <div className="alert alert-success py-2">{successMsg}</div>
+          )}
+          <div className="modal-action">
+            <button
+              type="button"
+              className="btn btn-ghost"
+              onClick={onClose}
+              disabled={loading}
+            >
+              Cancel
+            </button>
+            <button
+              type="submit"
+              className="btn btn-primary"
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Saving...
+                </>
+              ) : (
+                'Save'
+              )}
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
   search,
   setSearch,
@@ -32,6 +185,7 @@ export const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
   resetFilters,
   totalEmployees,
 }) => {
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   return (
     <>
       {/* Header */}
@@ -49,10 +203,19 @@ export const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
             <button className="btn btn-outline btn-sm" onClick={resetFilters}>
               Reset Filters
             </button>
-            <button className="btn btn-primary btn-sm">Add Employee</button>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              Add Employee
+            </button>
           </div>
         </div>
       </div>
+      <AddEmployeeModal
+        open={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
 
       {/* Filters */}
       <div className="card bg-base-200 shadow-sm mb-6">
