@@ -18,6 +18,11 @@ interface EmployeeFiltersProps {
   totalEmployees: number;
 }
 
+const roles = [
+  { id: 1, name: 'Agent' },
+  { id: 2, name: 'Business development manager' },
+];
+
 const AddEmployeeModal: React.FC<{
   open: boolean;
   onClose: () => void;
@@ -33,7 +38,9 @@ const AddEmployeeModal: React.FC<{
   const [error, setError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+  ) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
@@ -116,16 +123,21 @@ const AddEmployeeModal: React.FC<{
             required
             disabled={loading}
           />
-          <input
+          <select
             name="EmployeeRoleID"
-            type="number"
             className="input input-bordered w-full"
-            placeholder="Role ID"
             value={form.EmployeeRoleID}
             onChange={handleChange}
             required
             disabled={loading}
-          />
+          >
+            <option value="">Select Role</option>
+            {roles.map((role) => (
+              <option key={role.id} value={role.id}>
+                {role.name}
+              </option>
+            ))}
+          </select>
           <input
             name="EmployeeMailId"
             type="email"
