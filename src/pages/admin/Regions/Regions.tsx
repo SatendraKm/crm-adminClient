@@ -6,12 +6,14 @@ import RegionTable from './components/RegionTable';
 import RegionFilters from './components/RegionFilters';
 import Pagination from './components/Pagination';
 import StatusEditModal from './components/StatusEditModal';
+import CreateRegionModal from './components/CreateRegionModal';
 
 export interface FilterState {
   EmployeeName: string;
   role: string;
   Project: string;
   is_active: string;
+  RegionId: string;
 }
 
 export interface PaginationState {
@@ -25,7 +27,7 @@ const Regions: React.FC = () => {
   const [regions, setRegions] = useState<Region[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
-
+  const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
   // Modal state
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedEmployee, setSelectedEmployee] = useState<Region | null>(null);
@@ -37,6 +39,7 @@ const Regions: React.FC = () => {
     role: '',
     Project: '',
     is_active: '',
+    RegionId: '',
   });
 
   // Pagination state
@@ -106,6 +109,7 @@ const Regions: React.FC = () => {
       role: '',
       Project: '',
       is_active: '',
+      RegionId: '',
     });
     // Fetch will be triggered by useEffect due to filters change
   };
@@ -178,6 +182,10 @@ const Regions: React.FC = () => {
   const getUniqueProjects = () => {
     return [...new Set(regions.map((r) => r.Project))].filter(Boolean);
   };
+  // Get unique region IDs for filter dropdown
+  const getUniqueRegionIds = () => {
+    return [...new Set(regions.map((r) => r.RegionId))].filter(Boolean);
+  };
 
   return (
     <div className="container mx-auto p-6">
@@ -192,35 +200,44 @@ const Regions: React.FC = () => {
               Manage and view regional assignments
             </p>
           </div>
-          <button
-            className="btn btn-primary"
-            onClick={handleRefresh}
-            disabled={loading}
-          >
-            {loading ? (
-              <>
-                <span className="loading loading-spinner loading-sm"></span>
-                Loading...
-              </>
-            ) : (
-              <>
-                <svg
-                  className="w-4 h-4 mr-2"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-                  />
-                </svg>
-                Refresh
-              </>
-            )}
-          </button>
+          <div className="flex gap-2">
+            <button
+              className="btn btn-success"
+              onClick={() => setIsCreateModalOpen(true)}
+              disabled={loading}
+            >
+              + Assign New Region
+            </button>
+            <button
+              className="btn btn-primary"
+              onClick={handleRefresh}
+              disabled={loading}
+            >
+              {loading ? (
+                <>
+                  <span className="loading loading-spinner loading-sm"></span>
+                  Loading...
+                </>
+              ) : (
+                <>
+                  <svg
+                    className="w-4 h-4 mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+                    />
+                  </svg>
+                  Refresh
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -259,6 +276,7 @@ const Regions: React.FC = () => {
         onApplyFilters={handleApplyFilters}
         onClearFilters={handleClearFilters}
         projects={getUniqueProjects()}
+        regionIds={getUniqueRegionIds()}
         loading={loading}
       />
 
@@ -336,6 +354,11 @@ const Regions: React.FC = () => {
         employee={selectedEmployee}
         onConfirm={handleConfirmStatusUpdate}
         loading={isUpdatingStatus}
+      />
+      <CreateRegionModal
+        isOpen={isCreateModalOpen}
+        onClose={() => setIsCreateModalOpen(false)}
+        onCreated={fetchRegions}
       />
     </div>
   );

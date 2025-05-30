@@ -6,12 +6,14 @@ interface EmployeeTableProps {
   employees?: Employee[];
   loading: boolean;
   error: string | null;
+  onEditStatus?: (employee: Employee) => void;
 }
 
 export const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees = [],
   loading,
   error,
+  onEditStatus,
 }) => {
   if (loading) {
     return (
@@ -90,6 +92,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                   <EmployeeTableRow
                     key={employee.EmployeeId}
                     employee={employee}
+                    onEditStatus={onEditStatus}
                   />
                 ))
               )}

@@ -4,10 +4,12 @@ import { truncateText, getStatusBadge } from '../utils/employeeUtils';
 
 interface EmployeeTableRowProps {
   employee: Employee;
+  onEditStatus?: (employee: Employee) => void;
 }
 
 export const EmployeeTableRow: React.FC<EmployeeTableRowProps> = ({
   employee,
+  onEditStatus,
 }) => {
   // console.log(employee);
   return (
@@ -47,7 +49,10 @@ export const EmployeeTableRow: React.FC<EmployeeTableRowProps> = ({
       </td>
       <td>{getStatusBadge(employee.is_active)}</td>
       <td>
-        <button className="btn btn-ghost btn-xs">
+        <button
+          className="btn btn-ghost btn-xs"
+          onClick={() => onEditStatus?.(employee)}
+        >
           <svg
             xmlns="http://www.w3.org/2000/svg"
             className="h-4 w-4"

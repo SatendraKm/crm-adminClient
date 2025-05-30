@@ -8,6 +8,7 @@ interface RegionFiltersProps {
   onApplyFilters: () => void;
   onClearFilters: () => void;
   projects: string[];
+  regionIds: string[];
   loading: boolean;
 }
 
@@ -17,6 +18,7 @@ const RegionFilters: React.FC<RegionFiltersProps> = ({
   onApplyFilters,
   onClearFilters,
   projects,
+  regionIds,
   loading,
 }) => {
   const roles = ['BDM', 'Zonal Manager'];
@@ -111,6 +113,25 @@ const RegionFilters: React.FC<RegionFiltersProps> = ({
               ))}
             </select>
           </div>
+        </div>
+
+        <div className="form-control">
+          <label className="label">
+            <span className="label-text font-medium">Region</span>
+          </label>
+          <select
+            className="select select-bordered"
+            value={filters.RegionId}
+            onChange={(e) => onFilterChange({ RegionId: e.target.value })}
+            disabled={loading}
+          >
+            <option value="">All Regions</option>
+            {regionIds.map((regionId) => (
+              <option key={regionId} value={regionId}>
+                {regionId}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Action Buttons */}

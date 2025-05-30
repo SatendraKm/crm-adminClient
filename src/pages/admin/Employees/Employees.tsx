@@ -4,8 +4,54 @@ import { useEmployees } from './hooks/useEmployees';
 import { EmployeeFilters } from './components/EmployeeFilters';
 import { EmployeeTable } from './components/EmployeeTable';
 import { Pagination } from './components/Pagination';
+import { StatusEditModal } from './components/StatusEditModal';
+import axiosInstance from '../../../lib/axios';
 
 const Employees: React.FC = () => {
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [selectedEmployee, setSelectedEmployee] =
+    React.useState<Employee | null>(null);
+  const [statusLoading, setStatusLoading] = React.useState(false);
+
+  const handleEditStatus = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setModalOpen(true);
+  };
+
+  // Handler to confirm status change
+  const handleConfirmStatus = async (newStatus: boolean) => {
+    if (!selectedEmployee) return;
+    setStatusLoading(true);
+    try {
+      const res = await axiosInstance.put(
+        `/api/admin/employees/${selectedEmployee.EmployeeId}/status`,
+        { is_active: newStatus },
+      );
+      if (res.data.success) {
+        // Option 1: Refetch all employees
+        // await refetch();
+        // Option 2: Or update in-place if you want
+        // setEmployees((prev) =>
+        //   prev.map((emp) =>
+        //     emp.EmployeeId === selectedEmployee.EmployeeId
+        //       ? { ...emp, is_active: newStatus }
+        //       : emp,
+        //   ),
+        // );
+      } else {
+        alert(res.data.message || 'Failed to update status');
+      }
+    } catch (err: any) {
+      alert(
+        err.response?.data?.message || err.message || 'Failed to update status',
+      );
+    } finally {
+      setStatusLoading(false);
+      setModalOpen(false);
+      setSelectedEmployee(null);
+    }
+  };
+
   const {
     search,
     setSearch,
@@ -50,13 +96,26 @@ const Employees: React.FC = () => {
           resetFilters={resetFilters}
           totalEmployees={totalEmployees}
         />
-        <EmployeeTable employees={employees} loading={loading} error={error} />
+        <EmployeeTable
+          employees={employees}
+          loading={loading}
+          error={error}
+          onEditStatus={handleEditStatus}
+        />
         <Pagination
           page={page}
           totalPages={totalPages}
           totalEmployees={totalEmployees}
           limit={limit}
           onPageChange={setPage}
+        />
+        <StatusEditModal
+          open={modalOpen}
+          onClose={() => setModalOpen(false)}
+          employeeName={selectedEmployee?.EmployeeName || ''}
+          currentStatus={selectedEmployee?.is_active ?? null}
+          onConfirm={handleConfirmStatus}
+          loading={statusLoading}
         />
       </div>
     </div>
