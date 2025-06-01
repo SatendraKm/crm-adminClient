@@ -9,19 +9,16 @@ export interface Employee {
   EmployeeMailId: string | null;
   is_active: boolean | null;
   role: Role;
-  RegionName: string | null;
 }
 
 export interface FilterOptions {
   roles: string[];
-  regions: string[];
 }
 
 export interface EmployeeFilters {
   search: string;
   filterActive: 'All' | 'Active' | 'Inactive';
   filterRole: string;
-  filterRegion: string;
   page: number;
 }
 

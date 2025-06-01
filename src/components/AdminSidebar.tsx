@@ -5,15 +5,10 @@ import {
   ChevronRight,
   LayoutDashboard,
   Users,
-  // Settings,
   X,
   Home,
   MapPin,
   Megaphone,
-  // BarChart3,
-  // FileText,
-  // Bell,
-  // Shield,
 } from 'lucide-react';
 import { useAppSelector } from '../redux/hooks';
 
@@ -26,12 +21,11 @@ export default function AdminSidebar({ collapsed = false, close }: Props) {
   const [isCollapsed, setIsCollapsed] = useState(collapsed);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
-
   const { user } = useAppSelector((state) => state.user);
 
   useEffect(() => {
     const handleResize = () => {
-      setIsMobile(window.innerWidth < 1024); // lg breakpoint
+      setIsMobile(window.innerWidth < 1024);
     };
     handleResize();
     window.addEventListener('resize', handleResize);
@@ -47,12 +41,6 @@ export default function AdminSidebar({ collapsed = false, close }: Props) {
       label: 'Dashboard',
       color: 'text-blue-600',
     },
-    // {
-    //   path: '/admin/analytics',
-    //   icon: BarChart3,
-    //   label: 'Analytics',
-    //   color: 'text-green-600',
-    // },
     {
       path: '/admin/employees',
       icon: Users,
@@ -71,39 +59,15 @@ export default function AdminSidebar({ collapsed = false, close }: Props) {
       label: 'Campaigns',
       color: 'text-red-600',
     },
-    // {
-    //   path: '/admin/content',
-    //   icon: FileText,
-    //   label: 'Content',
-    //   color: 'text-orange-600',
-    // },
-    // {
-    //   path: '/admin/notifications',
-    //   icon: Bell,
-    //   label: 'Notifications',
-    //   color: 'text-yellow-600',
-    // },
-    // {
-    //   path: '/admin/security',
-    //   icon: Shield,
-    //   label: 'Security',
-    //   color: 'text-red-600',
-    // },
-    // {
-    //   path: '/admin/settings',
-    //   icon: Settings,
-    //   label: 'Settings',
-    //   color: 'text-gray-600',
-    // },
   ];
 
   const isActiveRoute = (path: string) => location.pathname === path;
-
   const widthClass = isMobile ? 'w-80 sm:w-72' : isCollapsed ? 'w-16' : 'w-64';
 
   return (
     <aside
-      className={`transition-all duration-300 h-full bg-gradient-to-b from-base-200 to-base-300 flex flex-col shadow-lg border-r border-base-300 ${widthClass}`}
+      className={`relative z-10 transition-all duration-300 h-full bg-gradient-to-b from-base-200 to-base-300 flex flex-col shadow-lg border-r border-base-300 ${widthClass}`}
+      style={{ overflowX: 'hidden', overflowY: 'auto' }}
     >
       {/* Header */}
       <div className="flex items-center justify-between p-4 border-b border-base-300 bg-base-200/50">
@@ -144,7 +108,7 @@ export default function AdminSidebar({ collapsed = false, close }: Props) {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-3 space-y-2 overflow-y-auto">
+      <nav className="flex-1 p-3 space-y-2">
         {menuItems.map((item) => {
           const Icon = item.icon;
           const isActive = isActiveRoute(item.path);
@@ -155,7 +119,7 @@ export default function AdminSidebar({ collapsed = false, close }: Props) {
               to={item.path}
               onClick={close}
               className={`
-                group flex items-center px-3 py-3 rounded-lg transition-all duration-200 relative
+                group relative flex items-center px-3 py-3 rounded-lg transition-all duration-200
                 ${
                   isActive
                     ? 'bg-primary text-primary-content shadow-md scale-105'
@@ -173,7 +137,7 @@ export default function AdminSidebar({ collapsed = false, close }: Props) {
               <Icon
                 size={20}
                 className={`
-                  transition-colors duration-200 flex-shrink-0
+                  flex-shrink-0 transition-colors duration-200
                   ${isActive ? 'text-primary-content' : item.color}
                   ${!isCollapsed || isMobile ? 'mr-3' : ''}
                 `}
@@ -187,11 +151,11 @@ export default function AdminSidebar({ collapsed = false, close }: Props) {
               )}
 
               {/* Tooltip for collapsed state */}
-              {isCollapsed && !isMobile && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-base-content text-base-100 text-sm rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-50">
+              {/* {isCollapsed && !isMobile && (
+                <div className="absolute left-full top-1/2 ml-3 transform -translate-y-1/2 bg-base-content text-base-100 text-sm px-2 py-1 rounded shadow-md whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-50 pointer-events-none">
                   {item.label}
                 </div>
-              )}
+              )} */}
             </Link>
           );
         })}

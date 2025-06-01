@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import axiosInstance from '../../../../lib/axios';
-import { truncateText } from '../utils/employeeUtils';
 
 interface EmployeeFiltersProps {
   search: string;
@@ -9,11 +8,8 @@ interface EmployeeFiltersProps {
   setFilterActive: (value: 'All' | 'Active' | 'Inactive') => void;
   filterRole: string;
   setFilterRole: (value: string) => void;
-  filterRegion: string;
-  setFilterRegion: (value: string) => void;
   setPage: (page: number) => void;
   availableRoles: string[];
-  uniqueRegions: string[];
   resetFilters: () => void;
   totalEmployees: number;
 }
@@ -115,7 +111,7 @@ const AddEmployeeModal: React.FC<{
           />
           <input
             name="EmployeePhone"
-            type="text"
+            type="number"
             className="input input-bordered w-full"
             placeholder="Phone"
             value={form.EmployeePhone}
@@ -189,11 +185,8 @@ export const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
   setFilterActive,
   filterRole,
   setFilterRole,
-  filterRegion,
-  setFilterRegion,
   setPage,
   availableRoles,
-  uniqueRegions,
   resetFilters,
   totalEmployees,
 }) => {
@@ -211,28 +204,13 @@ export const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
               {totalEmployees} employees found
             </p>
           </div>
-          <div className="flex gap-2">
-            <button className="btn btn-outline btn-sm" onClick={resetFilters}>
-              Reset Filters
-            </button>
-            <button
-              className="btn btn-primary btn-sm"
-              onClick={() => setIsAddModalOpen(true)}
-            >
-              Add Employee
-            </button>
-          </div>
         </div>
       </div>
-      <AddEmployeeModal
-        open={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-      />
 
       {/* Filters */}
       <div className="card bg-base-200 shadow-sm mb-6">
-        <div className="card-body p-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="card-body p-4 flex lg:flex-row flex-col items-center justify-between gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
             {/* Search */}
             <div className="form-control">
               <label className="label">
@@ -240,7 +218,7 @@ export const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
               </label>
               <input
                 type="text"
-                placeholder="Search by name or ID..."
+                placeholder="Search by name or ID"
                 className="input input-bordered input-sm"
                 value={search}
                 onChange={(e) => {
@@ -266,8 +244,8 @@ export const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
                 }}
               >
                 <option value="All">All Statuses</option>
-                <option value="Active">Active Only</option>
-                <option value="Inactive">Inactive/Null Only</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
               </select>
             </div>
 
@@ -292,31 +270,25 @@ export const EmployeeFilters: React.FC<EmployeeFiltersProps> = ({
                 ))}
               </select>
             </div>
-
-            {/* Region Filter */}
-            <div className="form-control">
-              <label className="label">
-                <span className="label-text font-medium">Region</span>
-              </label>
-              <select
-                className="select select-bordered select-sm"
-                value={filterRegion}
-                onChange={(e) => {
-                  setPage(1);
-                  setFilterRegion(e.target.value);
-                }}
-              >
-                <option value="All">All Regions</option>
-                {uniqueRegions.map((region) => (
-                  <option key={region} value={region}>
-                    {truncateText(region, 25)}
-                  </option>
-                ))}
-              </select>
-            </div>
+          </div>
+          {/* Action Buttons */}
+          <div className="flex gap-2">
+            <button className="btn btn-outline btn-sm" onClick={resetFilters}>
+              Reset Filters
+            </button>
+            <button
+              className="btn btn-primary btn-sm"
+              onClick={() => setIsAddModalOpen(true)}
+            >
+              Add Employee
+            </button>
           </div>
         </div>
       </div>
+      <AddEmployeeModal
+        open={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+      />
     </>
   );
 };

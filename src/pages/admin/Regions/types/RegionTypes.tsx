@@ -1,4 +1,5 @@
 export interface Region {
+  id: string;
   EmployeeId: string;
   EmployeeName: string;
   Project: string;

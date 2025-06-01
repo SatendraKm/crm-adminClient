@@ -55,7 +55,6 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
                 <th className="font-semibold">Name</th>
                 <th className="font-semibold">Phone</th>
                 <th className="font-semibold">Email</th>
-                <th className="font-semibold">Region</th>
                 <th className="font-semibold">Role</th>
                 <th className="font-semibold">Status</th>
                 <th className="font-semibold">Actions</th>

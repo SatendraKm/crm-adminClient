@@ -8,7 +8,6 @@ export const useEmployeeFilters = () => {
     'All' | 'Active' | 'Inactive'
   >('All');
   const [filterRole, setFilterRole] = useState<string>('All');
-  const [filterRegion, setFilterRegion] = useState<string>('All');
   const [page, setPage] = useState(1);
 
   // Debounce search input
@@ -29,7 +28,6 @@ export const useEmployeeFilters = () => {
     setDebouncedSearch('');
     setFilterActive('All');
     setFilterRole('All');
-    setFilterRegion('All');
     setPage(1);
   };
 
@@ -37,7 +35,6 @@ export const useEmployeeFilters = () => {
     search: debouncedSearch,
     filterActive,
     filterRole,
-    filterRegion,
     page,
   };
 
@@ -49,8 +46,6 @@ export const useEmployeeFilters = () => {
     setFilterActive,
     filterRole,
     setFilterRole,
-    filterRegion,
-    setFilterRegion,
     page,
     setPage,
     resetFilters,

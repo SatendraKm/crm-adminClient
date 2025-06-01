@@ -33,6 +33,26 @@ const Regions: React.FC = () => {
   const [selectedEmployee, setSelectedEmployee] = useState<Region | null>(null);
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
 
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const handleDeleteRegion = async (id: string) => {
+    if (!window.confirm('Are you sure you want to delete this entry?')) return;
+    setDeletingId(id);
+    try {
+      const response = await regionService.deleteRegion(id);
+      if (response.success) {
+        setRegions((prev) => prev.filter((r) => r.id !== id));
+        setError(null);
+        // Optionally show a toast here
+      } else {
+        setError(response.message || 'Failed to delete entry');
+      }
+    } catch (err) {
+      setError('Failed to delete entry. Please try again.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   // Filter state
   const [filters, setFilters] = useState<FilterState>({
     EmployeeName: '',
@@ -330,6 +350,8 @@ const Regions: React.FC = () => {
             regions={regions}
             loading={loading}
             onEditStatus={handleEditStatus}
+            onDelete={handleDeleteRegion}
+            deletingId={deletingId}
           />
 
           {/* Pagination */}

@@ -1,6 +1,6 @@
 // services/regionService.ts
 import axiosInstance from '../../../../lib/axios';
-import type { RegionApiResponse } from '../types/RegionTypes';
+import type { RegionApiResponse, Region } from '../types/RegionTypes';
 
 export interface RegionQueryParams {
   page?: number;
@@ -38,6 +38,20 @@ export const regionService = {
       return response.data;
     } catch (error) {
       console.error('Error fetching regions:', error);
+      throw error;
+    }
+  },
+
+  async deleteRegion(
+    id: string,
+  ): Promise<{ success: boolean; message: string }> {
+    try {
+      const response = await axiosInstance.delete(
+        `/api/admin/parivartan-bdm/${id}`,
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error deleting region:', error);
       throw error;
     }
   },

@@ -27,7 +27,6 @@ export const useCampaignSearch = (
         campaign.Employees.some(
           (employee) =>
             employee.EmployeeName.toLowerCase().includes(searchLower) ||
-            employee.EmployeePhone.includes(searchTerm) ||
             employee.EmployeeId.toString().includes(searchTerm) ||
             (employee.EmployeeRegion &&
               employee.EmployeeRegion.toLowerCase().includes(searchLower)),

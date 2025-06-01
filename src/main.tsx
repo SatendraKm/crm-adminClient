@@ -7,9 +7,10 @@ import { store } from './redux/store.ts';
 import { Provider } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
 import { persistor } from './redux/store.ts';
+import { Toaster } from 'react-hot-toast';
 
 // Set theme on html element
-document.documentElement.setAttribute('data-theme', 'nord');
+document.documentElement.setAttribute('data-theme', 'wireframe');
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
@@ -17,6 +18,7 @@ createRoot(document.getElementById('root')!).render(
       <PersistGate loading={null} persistor={persistor}>
         <BrowserRouter>
           <App />
+          <Toaster position="top-right" reverseOrder={false} />
         </BrowserRouter>
       </PersistGate>
     </Provider>

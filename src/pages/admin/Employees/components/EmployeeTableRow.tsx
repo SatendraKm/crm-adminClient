@@ -35,13 +35,6 @@ export const EmployeeTableRow: React.FC<EmployeeTableRowProps> = ({
       </td>
       <td>
         <div className="max-w-xs">
-          <span className="text-sm" title={employee.RegionName || ''}>
-            {truncateText(employee.RegionName, 20)}
-          </span>
-        </div>
-      </td>
-      <td>
-        <div className="max-w-xs">
           <span className="text-sm" title={employee.role?.RoleName || ''}>
             {truncateText(employee.role?.RoleName, 20)}
           </span>

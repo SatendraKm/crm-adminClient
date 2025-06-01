@@ -1,17 +1,22 @@
 // components/RegionTable.tsx
 import React from 'react';
 import type { Region } from '../types/RegionTypes';
+import { Trash2 } from 'lucide-react';
 
 interface RegionTableProps {
   regions: Region[];
   loading: boolean;
   onEditStatus: (employee: Region) => void;
+  onDelete: (employeeId: string) => void;
+  deletingId?: string | null;
 }
 
 const RegionTable: React.FC<RegionTableProps> = ({
   regions,
   loading,
   onEditStatus,
+  onDelete,
+  deletingId,
 }) => {
   if (loading) {
     return (
@@ -72,6 +77,7 @@ const RegionTable: React.FC<RegionTableProps> = ({
               </td>
               <td className="text-center">
                 <div className="flex justify-center gap-2">
+                  {/* Edit Status button */}
                   <button
                     className="btn btn-sm btn-outline btn-primary"
                     onClick={() => onEditStatus(region)}
@@ -90,7 +96,21 @@ const RegionTable: React.FC<RegionTableProps> = ({
                         d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"
                       />
                     </svg>
-                    Edit Status
+                  </button>
+                  {/* Delete button */}
+                  <button
+                    className="btn btn-sm btn-outline btn-error"
+                    onClick={() => onDelete(region.id)}
+                    disabled={deletingId === region.id}
+                    title="Delete Entry"
+                  >
+                    {deletingId === region.id ? (
+                      <span className="loading loading-spinner loading-xs"></span>
+                    ) : (
+                      <>
+                        <Trash2 className="w-4 h-4" />
+                      </>
+                    )}
                   </button>
                 </div>
               </td>

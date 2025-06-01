@@ -1,4 +1,5 @@
 import React from 'react';
+import type { Employee } from './types/EmployeeTypes';
 import { useEmployeeFilters } from './hooks/useEmployeeFilters';
 import { useEmployees } from './hooks/useEmployees';
 import { EmployeeFilters } from './components/EmployeeFilters';
@@ -6,12 +7,37 @@ import { EmployeeTable } from './components/EmployeeTable';
 import { Pagination } from './components/Pagination';
 import { StatusEditModal } from './components/StatusEditModal';
 import axiosInstance from '../../../lib/axios';
+import toast from 'react-hot-toast';
 
 const Employees: React.FC = () => {
   const [modalOpen, setModalOpen] = React.useState(false);
   const [selectedEmployee, setSelectedEmployee] =
     React.useState<Employee | null>(null);
   const [statusLoading, setStatusLoading] = React.useState(false);
+
+  const {
+    search,
+    setSearch,
+    filterActive,
+    setFilterActive,
+    filterRole,
+    setFilterRole,
+    page,
+    setPage,
+    resetFilters,
+    filters,
+  } = useEmployeeFilters();
+
+  const {
+    employees,
+    loading,
+    error,
+    totalPages,
+    totalEmployees,
+    availableRoles,
+    limit,
+    refetch,
+  } = useEmployees(filters);
 
   const handleEditStatus = (employee: Employee) => {
     setSelectedEmployee(employee);
@@ -28,16 +54,10 @@ const Employees: React.FC = () => {
         { is_active: newStatus },
       );
       if (res.data.success) {
-        // Option 1: Refetch all employees
-        // await refetch();
-        // Option 2: Or update in-place if you want
-        // setEmployees((prev) =>
-        //   prev.map((emp) =>
-        //     emp.EmployeeId === selectedEmployee.EmployeeId
-        //       ? { ...emp, is_active: newStatus }
-        //       : emp,
-        //   ),
-        // );
+        await refetch();
+        toast.success(
+          `Employee ${selectedEmployee.EmployeeName}'s status updated successfully!`,
+        );
       } else {
         alert(res.data.message || 'Failed to update status');
       }
@@ -52,32 +72,6 @@ const Employees: React.FC = () => {
     }
   };
 
-  const {
-    search,
-    setSearch,
-    filterActive,
-    setFilterActive,
-    filterRole,
-    setFilterRole,
-    filterRegion,
-    setFilterRegion,
-    page,
-    setPage,
-    resetFilters,
-    filters,
-  } = useEmployeeFilters();
-
-  const {
-    employees,
-    loading,
-    error,
-    totalPages,
-    totalEmployees,
-    availableRoles,
-    uniqueRegions,
-    limit,
-  } = useEmployees(filters);
-
   return (
     <div className="min-h-screen bg-base-100 p-4 lg:p-6">
       <div className="max-w-7xl mx-auto">
@@ -88,11 +82,8 @@ const Employees: React.FC = () => {
           setFilterActive={setFilterActive}
           filterRole={filterRole}
           setFilterRole={setFilterRole}
-          filterRegion={filterRegion}
-          setFilterRegion={setFilterRegion}
           setPage={setPage}
           availableRoles={availableRoles}
-          uniqueRegions={uniqueRegions}
           resetFilters={resetFilters}
           totalEmployees={totalEmployees}
         />

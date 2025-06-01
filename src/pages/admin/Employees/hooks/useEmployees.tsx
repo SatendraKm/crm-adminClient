@@ -14,7 +14,6 @@ export const useEmployees = (filters: EmployeeFilters) => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalEmployees, setTotalEmployees] = useState(0);
   const [availableRoles, setAvailableRoles] = useState<string[]>([]);
-  const [uniqueRegions, setUniqueRegions] = useState<string[]>([]);
 
   const limit = 10;
 
@@ -27,12 +26,10 @@ export const useEmployees = (filters: EmployeeFilters) => {
       }>('/api/admin/employees/filters');
       if (res.data.success) {
         setAvailableRoles(res.data.data.roles || []);
-        setUniqueRegions(res.data.data.regions || []);
       }
     } catch (err) {
       console.error('Error fetching filter options:', err);
       setAvailableRoles([]);
-      setUniqueRegions([]);
     }
   };
 
@@ -49,17 +46,15 @@ export const useEmployees = (filters: EmployeeFilters) => {
       });
 
       if (filters.filterActive !== 'All') {
-        params.append('is_active', filters.filterActive);
+        params.append(
+          'is_active',
+          filters.filterActive === 'Active' ? 'true' : 'false',
+        );
       }
 
       if (filters.filterRole !== 'All') {
         params.append('role', filters.filterRole);
       }
-
-      if (filters.filterRegion !== 'All') {
-        params.append('region', filters.filterRegion);
-      }
-      console.log(params.toString());
 
       const res = await axiosInstance.get<EmployeeResponse>(
         `/api/admin/employees?${params}`,
@@ -87,13 +82,7 @@ export const useEmployees = (filters: EmployeeFilters) => {
 
   useEffect(() => {
     fetchEmployees();
-  }, [
-    filters.search,
-    filters.filterActive,
-    filters.filterRole,
-    filters.filterRegion,
-    filters.page,
-  ]);
+  }, [filters.search, filters.filterActive, filters.filterRole, filters.page]);
 
   return {
     employees,
@@ -102,7 +91,6 @@ export const useEmployees = (filters: EmployeeFilters) => {
     totalPages,
     totalEmployees,
     availableRoles,
-    uniqueRegions,
     limit,
     refetch: fetchEmployees,
   };

@@ -17,12 +17,12 @@ export default function AdminLayout() {
   const openMobileSidebar = () => setIsMobileSidebarOpen(true);
 
   return (
-    <div className="min-h-screen bg-base-100">
+    <div className="min-h-screen bg-base-100 overflow-x-hidden">
       {/* Desktop Layout */}
       <div className="hidden lg:flex h-screen">
         {/* Desktop Sidebar */}
         <div className="flex-shrink-0">
-          <AdminSidebar collapsed={false} />
+          <AdminSidebar collapsed={true} />
         </div>
 
         {/* Desktop Main Content */}
