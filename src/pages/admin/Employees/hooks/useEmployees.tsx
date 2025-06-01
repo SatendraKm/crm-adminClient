@@ -59,6 +59,7 @@ export const useEmployees = (filters: EmployeeFilters) => {
       const res = await axiosInstance.get<EmployeeResponse>(
         `/api/admin/employees?${params}`,
       );
+      console.log(res);
 
       if (res.data.success) {
         // Corrected data extraction based on actual API response structure

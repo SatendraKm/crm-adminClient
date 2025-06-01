@@ -10,7 +10,7 @@ import { persistor } from './redux/store.ts';
 import { Toaster } from 'react-hot-toast';
 
 // Set theme on html element
-document.documentElement.setAttribute('data-theme', 'wireframe');
+document.documentElement.setAttribute('data-theme', 'lofi');
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

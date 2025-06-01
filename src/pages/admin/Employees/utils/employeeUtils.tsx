@@ -12,8 +12,12 @@ export const getStatusBadge = (
   isActive: boolean | null,
 ): React.ReactElement => {
   if (isActive === true) {
-    return <div className="badge badge-success badge-sm">Active</div>;
+    return (
+      <div className="badge badge-accent badge-success badge-sm">Active</div>
+    );
   } else {
-    return <div className="badge badge-error badge-sm">Inactive</div>;
+    return (
+      <div className="badge badge-soft badge-error badge-sm">Inactive</div>
+    );
   }
 };

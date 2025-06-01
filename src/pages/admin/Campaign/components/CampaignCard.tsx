@@ -7,12 +7,14 @@ interface CampaignCardProps {
   campaign: Campaign;
   isExpanded: boolean;
   onToggle: () => void;
+  refetch: () => Promise<void>;
 }
 
 const CampaignCard: React.FC<CampaignCardProps> = ({
   campaign,
   isExpanded,
   onToggle,
+  refetch,
 }) => {
   const [employees, setEmployees] = useState(campaign.Employees);
 
@@ -89,6 +91,7 @@ const CampaignCard: React.FC<CampaignCardProps> = ({
               employees={employees}
               campaignId={campaign.CampaignId}
               onEmployeeRemoved={handleEmployeeRemoved}
+              refetch={refetch}
             />
           </div>
         )}

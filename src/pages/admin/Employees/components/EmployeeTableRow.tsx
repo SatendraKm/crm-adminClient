@@ -13,7 +13,7 @@ export const EmployeeTableRow: React.FC<EmployeeTableRowProps> = ({
 }) => {
   // console.log(employee);
   return (
-    <tr className="hover">
+    <tr className="hover:bg-base-300">
       <td className="font-mono text-sm">{employee.EmployeeId}</td>
       <td>
         <div className="font-medium">{employee.EmployeeName}</div>
@@ -40,7 +40,9 @@ export const EmployeeTableRow: React.FC<EmployeeTableRowProps> = ({
           </span>
         </div>
       </td>
-      <td>{getStatusBadge(employee.is_active)}</td>
+      <td>
+        <div className="">{getStatusBadge(employee.is_active)}</div>
+      </td>
       <td>
         <button
           className="btn btn-ghost btn-xs"

@@ -1,44 +1,65 @@
-import React from 'react';
+import React, { useState } from 'react';
 import axiosInstance from '../../../../lib/axios';
 import type { Employee } from '../types/CampaignTypes';
 import { Trash2 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import ConfirmDeleteModal from './confirmDeleteModal';
 
 interface EmployeeTableProps {
   employees: Employee[];
   campaignId: number;
   onEmployeeRemoved?: (employeeId: number) => void;
+  refetch?: () => Promise<void>;
 }
 
 const EmployeeTable: React.FC<EmployeeTableProps> = ({
   employees,
   campaignId,
   onEmployeeRemoved,
+  refetch,
 }) => {
-  const handleDelete = async (employeeId: number) => {
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(
+    null,
+  );
+  const [deleting, setDeleting] = useState(false);
+
+  const handleDeleteClick = (employee: Employee) => {
+    setSelectedEmployee(employee);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedEmployee) return;
+    setDeleting(true);
     try {
       const res = await axiosInstance.delete(
         '/api/admin/campaigns/employee-campaign',
         {
           data: {
-            EmployeeId: employeeId,
+            EmployeeId: selectedEmployee.EmployeeId,
             CampaignId: campaignId,
           },
         },
       );
       if (res.data.success) {
-        if (onEmployeeRemoved) onEmployeeRemoved(employeeId);
+        if (onEmployeeRemoved) onEmployeeRemoved(selectedEmployee.EmployeeId);
         toast.success('Employee removed successfully');
+        if (refetch) await refetch();
       } else {
         alert(res.data.message || 'Failed to remove employee');
       }
     } catch (err) {
       alert('Error removing employee');
+    } finally {
+      setDeleting(false);
+      setDeleteModalOpen(false);
+      setSelectedEmployee(null);
     }
   };
   return (
     <div className="overflow-x-auto">
-      <table className="table table-zebra w-full">
+      <table className="table w-full">
         <thead>
           <tr>
             <th className="text-left">Employee ID</th>
@@ -69,13 +90,20 @@ const EmployeeTable: React.FC<EmployeeTableProps> = ({
               <td>
                 <button
                   className="btn btn-ghost btn-xs text-error"
-                  onClick={() => handleDelete(employee.EmployeeId)}
+                  onClick={() => handleDeleteClick(employee)}
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </td>
             </tr>
           ))}
+          <ConfirmDeleteModal
+            open={deleteModalOpen}
+            onClose={() => setDeleteModalOpen(false)}
+            onConfirm={handleConfirmDelete}
+            employeeName={selectedEmployee?.EmployeeName}
+            loading={deleting}
+          />
         </tbody>
       </table>
 

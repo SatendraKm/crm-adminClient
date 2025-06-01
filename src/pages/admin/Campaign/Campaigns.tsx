@@ -438,6 +438,7 @@ const Campaigns: React.FC = () => {
               campaign={campaign}
               isExpanded={isExpanded(campaign.CampaignId)}
               onToggle={() => toggleCampaign(campaign.CampaignId)}
+              refetch={refetch} // <-- pass refetch here
             />
           ))}
         </div>

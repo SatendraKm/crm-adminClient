@@ -48,7 +48,7 @@ export const EmployeeTable: React.FC<EmployeeTableProps> = ({
     <div className="card bg-base-100 shadow-sm">
       <div className="card-body p-0">
         <div className="overflow-x-auto">
-          <table className="table table-zebra table-pin-rows">
+          <table className="overflow-x-auto table rounded-box border border-base bg-base-100 ">
             <thead>
               <tr className="bg-base-200">
                 <th className="font-semibold">ID</th>
