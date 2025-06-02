@@ -9,6 +9,7 @@ import { Navigate } from 'react-router-dom';
 import Employees from './pages/admin/Employees/Employees';
 import Campaigns from './pages/admin/Campaign/Campaigns';
 import Regions from './pages/admin/Regions/Regions';
+// import Temp from './pages/admin/Temp/Regions/Regions';
 
 function App() {
   return (
@@ -33,6 +34,7 @@ function App() {
         <Route path="employees" element={<Employees />} />
         <Route path="campaigns" element={<Campaigns />} />
         <Route path="regions" element={<Regions />} />
+        {/* <Route path="temp" element={<Temp />} /> */}
         <Route path="*" element={<NotFound />} />
       </Route>
     </Routes>
