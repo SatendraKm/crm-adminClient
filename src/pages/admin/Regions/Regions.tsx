@@ -174,28 +174,26 @@ const Regions: React.FC = () => {
     try {
       setIsUpdatingStatus(true);
 
+      // Pass RegionId to the API
       const response = await regionService.updateEmployeeStatus(
         employeeId,
         newStatus,
+        selectedEmployee?.RegionId, // Pass the RegionId of the selected assignment
       );
 
       if (response.success) {
-        // Update the region in the current list
+        // Update only the correct region assignment for this employee
         setRegions((prev) =>
           prev.map((region) =>
-            region.EmployeeId === employeeId
+            region.EmployeeId === employeeId &&
+            region.RegionId === selectedEmployee?.RegionId
               ? { ...region, is_active: newStatus }
               : region,
           ),
         );
 
-        // Show success message (you can use toast notification here)
         setError(null);
-
-        // Close modal
         handleCloseModal();
-
-        // Optional: Show success toast
         console.log('Status updated successfully:', response.message);
       } else {
         setError(response.message || 'Failed to update status');

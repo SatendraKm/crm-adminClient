@@ -59,11 +59,15 @@ export const regionService = {
   async updateEmployeeStatus(
     employeeId: string,
     status: 'Active' | 'Inactive',
+    regionId?: string, // Add regionId param
   ): Promise<UpdateStatusResponse> {
     try {
       const response = await axiosInstance.put<UpdateStatusResponse>(
         `/api/admin/regions/${employeeId}/status`,
-        { is_active: status },
+        {
+          RegionId: regionId, // Send RegionId in body
+          is_active: status,
+        },
       );
       return response.data;
     } catch (error) {
