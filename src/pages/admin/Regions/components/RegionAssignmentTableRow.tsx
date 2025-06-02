@@ -16,10 +16,7 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
 }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const handleToggleStatus = async (
-    regionId: string,
-    currentStatus: string,
-  ) => {
+  const toggleStatus = async (regionId: string, currentStatus: string) => {
     try {
       const payload = {
         RegionId: regionId,
@@ -33,35 +30,36 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
         toast.success('Status updated');
         refetch();
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to update status');
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this region assignment?'))
-      return;
+  const deleteAssignment = async (id: number) => {
+    const confirmed = window.confirm('Delete this region assignment?');
+    if (!confirmed) return;
+
     try {
       const res = await axiosInstance.delete(`/api/admin/parivartan-bdm/${id}`);
       if (res.data.success) {
-        toast.success('Region assignment deleted');
+        toast.success('Assignment deleted');
         refetch();
       }
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete assignment');
     }
   };
 
   return (
     <>
-      <tr className="hover">
-        <td colSpan={6}>
-          <div
-            className="flex justify-between items-center cursor-pointer"
-            onClick={() => setIsExpanded(!isExpanded)}
-          >
+      <tr
+        className="hover cursor-pointer"
+        onClick={() => setIsExpanded(!isExpanded)}
+      >
+        <td colSpan={6} className="p-4">
+          <div className="flex justify-between items-center">
             <div>
-              <div className="font-semibold">
+              <div className="font-semibold text-base">
                 {assignments[0]?.EmployeeName}
               </div>
               <div className="text-sm text-gray-500">
@@ -77,16 +75,16 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
 
       {isExpanded && (
         <tr>
-          <td colSpan={6}>
-            <div className="bg-base-200 rounded-md p-4 mt-2">
-              <table className="table w-full">
+          <td colSpan={6} className="p-0">
+            <div className="bg-base-200 rounded-b-lg p-4 border-t border-base-300 animate-fade-in">
+              <table className="table w-full text-sm">
                 <thead>
                   <tr>
                     <th>Region</th>
                     <th>Project</th>
                     <th>Role</th>
                     <th>Status</th>
-                    <th>Actions</th>
+                    <th className="text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -95,19 +93,27 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
                       <td>{a.RegionName}</td>
                       <td>{a.Project}</td>
                       <td>{a.role}</td>
-                      <td>{a.is_active}</td>
                       <td>
+                        <span
+                          className={`badge ${
+                            a.is_active === 'Active'
+                              ? 'badge-success'
+                              : 'badge-ghost'
+                          }`}
+                        >
+                          {a.is_active}
+                        </span>
+                      </td>
+                      <td className="text-right space-x-2">
                         <button
-                          className="btn btn-xs btn-outline btn-info mr-2"
-                          onClick={() =>
-                            handleToggleStatus(a.RegionId, a.is_active)
-                          }
+                          className="btn btn-xs btn-outline btn-info"
+                          onClick={() => toggleStatus(a.RegionId, a.is_active)}
                         >
                           {a.is_active === 'Active' ? 'Deactivate' : 'Activate'}
                         </button>
                         <button
                           className="btn btn-xs btn-outline btn-error"
-                          onClick={() => handleDelete(a.id)}
+                          onClick={() => deleteAssignment(a.id)}
                         >
                           Delete
                         </button>

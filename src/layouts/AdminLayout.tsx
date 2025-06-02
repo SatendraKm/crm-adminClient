@@ -22,7 +22,7 @@ export default function AdminLayout() {
       <div className="hidden lg:flex h-screen">
         {/* Desktop Sidebar */}
         <div className="flex-shrink-0">
-          <AdminSidebar collapsed={true} />
+          <AdminSidebar collapsed={false} />
         </div>
 
         {/* Desktop Main Content */}
