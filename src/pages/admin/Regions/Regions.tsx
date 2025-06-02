@@ -7,6 +7,7 @@ import RegionFilters from './components/RegionFilters';
 import Pagination from './components/Pagination';
 import StatusEditModal from './components/StatusEditModal';
 import CreateRegionModal from './components/CreateRegionModal';
+import ConfirmModal from './components/ConfirmModal';
 
 export interface FilterState {
   EmployeeName: string;
@@ -34,15 +35,20 @@ const Regions: React.FC = () => {
   const [isUpdatingStatus, setIsUpdatingStatus] = useState<boolean>(false);
 
   const [deletingId, setDeletingId] = useState<string | null>(null);
-  const handleDeleteRegion = async (id: string) => {
-    if (!window.confirm('Are you sure you want to delete this entry?')) return;
-    setDeletingId(id);
+  const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+
+  const handleDeleteRegion = (id: string) => {
+    setConfirmDeleteId(id);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!confirmDeleteId) return;
+    setDeletingId(confirmDeleteId);
     try {
-      const response = await regionService.deleteRegion(id);
+      const response = await regionService.deleteRegion(confirmDeleteId);
       if (response.success) {
-        setRegions((prev) => prev.filter((r) => r.id !== id));
+        setRegions((prev) => prev.filter((r) => r.id !== confirmDeleteId));
         setError(null);
-        // Optionally show a toast here
       } else {
         setError(response.message || 'Failed to delete entry');
       }
@@ -50,7 +56,11 @@ const Regions: React.FC = () => {
       setError('Failed to delete entry. Please try again.');
     } finally {
       setDeletingId(null);
+      setConfirmDeleteId(null);
     }
+  };
+  const handleCancelDelete = () => {
+    setConfirmDeleteId(null);
   };
 
   // Filter state
@@ -353,6 +363,14 @@ const Regions: React.FC = () => {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
         onCreated={fetchRegions}
+      />
+      <ConfirmModal
+        isOpen={!!confirmDeleteId}
+        title="Delete Region"
+        message="Are you sure you want to delete this entry?"
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+        loading={deletingId === confirmDeleteId}
       />
     </div>
   );
