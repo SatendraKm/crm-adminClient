@@ -261,34 +261,6 @@ const Regions: React.FC = () => {
         </div>
       </div>
 
-      {/* Stats Cards */}
-      {!loading && !error && (
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <div className="stat bg-base-100 rounded-box shadow">
-            <div className="stat-title">Total Records</div>
-            <div className="stat-value text-primary">{pagination.total}</div>
-          </div>
-          <div className="stat bg-base-100 rounded-box shadow">
-            <div className="stat-title">Current Page</div>
-            <div className="stat-value text-info">
-              {pagination.currentPage} / {pagination.totalPages}
-            </div>
-          </div>
-          <div className="stat bg-base-100 rounded-box shadow">
-            <div className="stat-title">Active Regions</div>
-            <div className="stat-value text-success">
-              {regions.filter((r) => r.is_active === 'Active').length}
-            </div>
-          </div>
-          <div className="stat bg-base-100 rounded-box shadow">
-            <div className="stat-title">Projects</div>
-            <div className="stat-value text-secondary">
-              {getUniqueProjects().length}
-            </div>
-          </div>
-        </div>
-      )}
-
       {/* Filters */}
       <RegionFilters
         filters={filters}

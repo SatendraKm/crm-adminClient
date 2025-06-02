@@ -12,8 +12,8 @@ const CreateRegionModal: React.FC<Props> = ({ isOpen, onClose, onCreated }) => {
     EmployeeId: '',
     EmployeeName: '',
     RegionId: '',
-    is_zonal_manager: 'No',
-    is_bdm: 'Yes',
+    is_zonal_manager: '',
+    is_bdm: '',
     Project: '',
   });
   const [loading, setLoading] = useState(false);
@@ -56,10 +56,13 @@ const CreateRegionModal: React.FC<Props> = ({ isOpen, onClose, onCreated }) => {
   const handleEmployeeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedId = e.target.value;
     const emp = employees.find((emp) => String(emp.EmployeeId) === selectedId);
+
     setForm({
       ...form,
       EmployeeId: selectedId,
-      EmployeeName: emp ? emp.EmployeeName : '',
+      EmployeeName: emp?.EmployeeName || '',
+      is_zonal_manager: emp?.EmployeeRoleID === 3 ? 'Yes' : 'No',
+      is_bdm: emp?.EmployeeRoleID === 2 ? 'Yes' : 'No',
     });
   };
 
@@ -155,70 +158,7 @@ const CreateRegionModal: React.FC<Props> = ({ isOpen, onClose, onCreated }) => {
             <option value="Gen Nxt">Gen Nxt</option>
             <option value="Open Shed">Open Shed</option>
           </select>
-          <div className="flex flex-col gap-2">
-            {/* Zonal Manager */}
-            <div>
-              <span className="label-text block mb-1 font-medium">
-                Zonal Manager
-              </span>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="is_zonal_manager"
-                    value="Yes"
-                    className="radio radio-primary"
-                    checked={form.is_zonal_manager === 'Yes'}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                  <span>Yes</span>
-                </label>
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="is_zonal_manager"
-                    value="No"
-                    className="radio radio-primary"
-                    checked={form.is_zonal_manager === 'No'}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                  <span>No</span>
-                </label>
-              </div>
-            </div>
-            {/* BDM */}
-            <div>
-              <span className="label-text block mb-1 font-medium">BDM</span>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="is_bdm"
-                    value="Yes"
-                    className="radio radio-primary"
-                    checked={form.is_bdm === 'Yes'}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                  <span>Yes</span>
-                </label>
-                <label className="flex items-center gap-1 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="is_bdm"
-                    value="No"
-                    className="radio radio-primary"
-                    checked={form.is_bdm === 'No'}
-                    onChange={handleChange}
-                    disabled={loading}
-                  />
-                  <span>No</span>
-                </label>
-              </div>
-            </div>
-          </div>
+
           {error && <div className="alert alert-error">{error}</div>}
           {success && <div className="alert alert-success">{success}</div>}
           <div className="modal-action">

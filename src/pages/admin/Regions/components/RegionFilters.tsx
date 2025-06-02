@@ -21,7 +21,7 @@ const RegionFilters: React.FC<RegionFiltersProps> = ({
   regionIds,
   loading,
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(true);
   const roles = ['BDM', 'Zonal Manager'];
   const statusOptions = ['Active', 'Inactive'];
 
