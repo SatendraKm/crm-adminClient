@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import axiosInstance from '../../../../lib/axios';
 import toast from 'react-hot-toast';
 import type { Assignment } from '../hooks/useGroupedRegionData';
+import { ChevronDown, ChevronUp } from 'lucide-react';
 
 interface Props {
   employeeId: string;
@@ -66,8 +67,13 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
                 ID: {assignments[0]?.EmployeeId}
               </div>
             </div>
-            <div className="text-sm text-gray-500">
-              Total Regions: {assignments.length}
+            <div className="flex items-center gap-1 text-sm text-gray-500 select-none">
+              <span>Total Regions: {assignments.length}</span>
+              {isExpanded ? (
+                <ChevronUp size={16} className="transition-transform" />
+              ) : (
+                <ChevronDown size={16} className="transition-transform" />
+              )}
             </div>
           </div>
         </td>
@@ -76,7 +82,7 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
       {isExpanded && (
         <tr>
           <td colSpan={6} className="p-0">
-            <div className="bg-base-200 rounded-b-lg p-4 border-t border-base-300 animate-fade-in">
+            <div className="bg-base-200 rounded-b-lg p-4 border-t border-base-300 shadow-sm animate-fade-in mb-4">
               <table className="table w-full text-sm">
                 <thead>
                   <tr>

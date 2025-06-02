@@ -27,7 +27,7 @@ const RegionAssignmentTable: React.FC<Props> = ({ data, loading, refetch }) => {
 
   return (
     <div className="overflow-x-auto rounded-lg shadow border border-base-300">
-      <table className="table table-zebra w-full">
+      <table className="table w-full">
         <thead className="bg-base-200 text-base-content">
           <tr>
             <th
