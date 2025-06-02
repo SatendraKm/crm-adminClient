@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import RegionFilters from './components/RegionFilters';
 import RegionAssignmentTable from './components/RegionAssignmentTable';
 import useGroupedRegionData from './hooks/useGroupedRegionData';
