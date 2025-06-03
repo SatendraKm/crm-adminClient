@@ -8,20 +8,44 @@ interface Props {
   employeeId: string;
   assignments: Assignment[];
   refetch: () => void;
+  isExpanded: boolean;
+  onToggleExpand: () => void;
 }
 
 const RegionAssignmentTableRow: React.FC<Props> = ({
   employeeId,
   assignments,
   refetch,
+  isExpanded,
+  onToggleExpand,
 }) => {
-  const [isExpanded, setIsExpanded] = useState(false);
+  // Modal state for status toggle
+  const [statusModal, setStatusModal] = useState<{
+    open: boolean;
+    regionId: string;
+    currentStatus: string;
+  }>({ open: false, regionId: '', currentStatus: '' });
 
-  const toggleStatus = async (regionId: string, currentStatus: string) => {
+  // Modal state for delete
+  const [deleteModal, setDeleteModal] = useState<{
+    open: boolean;
+    assignmentId: number | null;
+    regionName: string;
+  }>({ open: false, assignmentId: null, regionName: '' });
+
+  const [loading, setLoading] = useState(false);
+
+  const handleToggleStatus = (regionId: string, currentStatus: string) => {
+    setStatusModal({ open: true, regionId, currentStatus });
+  };
+
+  const confirmToggleStatus = async () => {
+    setLoading(true);
     try {
       const payload = {
-        RegionId: regionId,
-        is_active: currentStatus === 'Active' ? 'Inactive' : 'Active',
+        RegionId: statusModal.regionId,
+        is_active:
+          statusModal.currentStatus === 'Active' ? 'Inactive' : 'Active',
       };
       const res = await axiosInstance.put(
         `/api/admin/regions/${employeeId}/status`,
@@ -30,33 +54,45 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
       if (res.data.success) {
         toast.success('Status updated');
         refetch();
+      } else {
+        toast.error(res.data.message || 'Failed to update status');
       }
     } catch {
       toast.error('Failed to update status');
+    } finally {
+      setLoading(false);
+      setStatusModal({ open: false, regionId: '', currentStatus: '' });
     }
   };
 
-  const deleteAssignment = async (id: number) => {
-    const confirmed = window.confirm('Delete this region assignment?');
-    if (!confirmed) return;
+  const handleDeleteAssignment = (id: number, regionName: string) => {
+    setDeleteModal({ open: true, assignmentId: id, regionName });
+  };
 
+  const confirmDeleteAssignment = async () => {
+    if (!deleteModal.assignmentId) return;
+    setLoading(true);
     try {
-      const res = await axiosInstance.delete(`/api/admin/parivartan-bdm/${id}`);
+      const res = await axiosInstance.delete(
+        `/api/admin/parivartan-bdm/${deleteModal.assignmentId}`,
+      );
       if (res.data.success) {
         toast.success('Assignment deleted');
         refetch();
+      } else {
+        toast.error(res.data.message || 'Failed to delete assignment');
       }
     } catch {
       toast.error('Failed to delete assignment');
+    } finally {
+      setLoading(false);
+      setDeleteModal({ open: false, assignmentId: null, regionName: '' });
     }
   };
 
   return (
     <>
-      <tr
-        className="hover cursor-pointer"
-        onClick={() => setIsExpanded(!isExpanded)}
-      >
+      <tr className="hover cursor-pointer" onClick={onToggleExpand}>
         <td colSpan={6} className="p-4">
           <div className="flex justify-between items-center">
             <div>
@@ -113,13 +149,17 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
                       <td className="text-right space-x-2">
                         <button
                           className="btn btn-xs btn-outline btn-info"
-                          onClick={() => toggleStatus(a.RegionId, a.is_active)}
+                          onClick={() =>
+                            handleToggleStatus(a.RegionId, a.is_active)
+                          }
                         >
                           {a.is_active === 'Active' ? 'Deactivate' : 'Activate'}
                         </button>
                         <button
                           className="btn btn-xs btn-outline btn-error"
-                          onClick={() => deleteAssignment(a.id)}
+                          onClick={() =>
+                            handleDeleteAssignment(a.id, a.RegionName)
+                          }
                         >
                           Delete
                         </button>
@@ -131,6 +171,105 @@ const RegionAssignmentTableRow: React.FC<Props> = ({
             </div>
           </td>
         </tr>
+      )}
+      {/* Toggle Status Modal */}
+      {statusModal.open && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-sm">
+            <h3 className="font-bold text-lg mb-4">
+              {statusModal.currentStatus === 'Active'
+                ? 'Deactivate'
+                : 'Activate'}{' '}
+              Region Assignment
+            </h3>
+            <p>
+              Are you sure you want to{' '}
+              <span className="font-semibold">
+                {statusModal.currentStatus === 'Active'
+                  ? 'deactivate'
+                  : 'activate'}
+              </span>{' '}
+              this region assignment?
+            </p>
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() =>
+                  setStatusModal({
+                    open: false,
+                    regionId: '',
+                    currentStatus: '',
+                  })
+                }
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                className={`btn ${
+                  statusModal.currentStatus === 'Active'
+                    ? 'btn-error'
+                    : 'btn-success'
+                }`}
+                onClick={confirmToggleStatus}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Saving...
+                  </>
+                ) : statusModal.currentStatus === 'Active' ? (
+                  'Deactivate'
+                ) : (
+                  'Activate'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Delete Assignment Modal */}
+      {deleteModal.open && (
+        <div className="modal modal-open">
+          <div className="modal-box max-w-sm">
+            <h3 className="font-bold text-lg mb-4">Delete Region Assignment</h3>
+            <p>
+              Are you sure you want to delete the assignment for region{' '}
+              <span className="font-semibold">{deleteModal.regionName}</span>?
+            </p>
+            <div className="modal-action">
+              <button
+                className="btn btn-ghost"
+                onClick={() =>
+                  setDeleteModal({
+                    open: false,
+                    assignmentId: null,
+                    regionName: '',
+                  })
+                }
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                className="btn btn-error"
+                onClick={confirmDeleteAssignment}
+                disabled={loading}
+              >
+                {loading ? (
+                  <>
+                    <span className="loading loading-spinner loading-sm"></span>
+                    Deleting...
+                  </>
+                ) : (
+                  'Delete'
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </>
   );

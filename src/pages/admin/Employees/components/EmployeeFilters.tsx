@@ -17,6 +17,7 @@ interface EmployeeFiltersProps {
 const roles = [
   { id: 1, name: 'Agent' },
   { id: 2, name: 'Business development manager' },
+  { id: 3, name: 'Zonal Head Parivartan' },
 ];
 
 const AddEmployeeModal: React.FC<{

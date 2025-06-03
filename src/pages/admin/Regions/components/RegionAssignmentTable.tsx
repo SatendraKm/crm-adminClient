@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import type { GroupedEmployee } from '../hooks/useGroupedRegionData';
 import RegionAssignmentTableRow from './RegionAssignmentTableRow';
 
@@ -9,6 +9,16 @@ interface Props {
 }
 
 const RegionAssignmentTable: React.FC<Props> = ({ data, loading, refetch }) => {
+  // Track expanded rows by employeeId
+  const [expandedRows, setExpandedRows] = useState<Record<string, boolean>>({});
+
+  const handleToggleExpand = (employeeId: string) => {
+    setExpandedRows((prev) => ({
+      ...prev,
+      [employeeId]: !prev[employeeId],
+    }));
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-10 text-lg text-gray-500 animate-pulse">
@@ -45,6 +55,8 @@ const RegionAssignmentTable: React.FC<Props> = ({ data, loading, refetch }) => {
               employeeId={employee.EmployeeId}
               assignments={employee.assignments}
               refetch={refetch}
+              isExpanded={!!expandedRows[employee.EmployeeId]}
+              onToggleExpand={() => handleToggleExpand(employee.EmployeeId)}
             />
           ))}
         </tbody>

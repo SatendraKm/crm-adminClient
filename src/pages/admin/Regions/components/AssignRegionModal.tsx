@@ -11,6 +11,7 @@ interface Props {
 interface Employee {
   EmployeeId: number;
   EmployeeName: string;
+  EmployeeRoleID: number;
 }
 
 interface Region {
@@ -110,11 +111,13 @@ const AssignRegionModal: React.FC<Props> = ({
             onChange={(e) => handleChange('EmployeeId', e.target.value)}
           >
             <option value="">Select Employee</option>
-            {employees.map((emp) => (
-              <option key={emp.EmployeeId} value={emp.EmployeeId}>
-                {emp.EmployeeName} ({emp.EmployeeId})
-              </option>
-            ))}
+            {employees
+              .filter((emp) => [1, 2, 3].includes(emp.EmployeeRoleID))
+              .map((emp) => (
+                <option key={emp.EmployeeId} value={emp.EmployeeId}>
+                  {emp.EmployeeName} ({emp.EmployeeId})
+                </option>
+              ))}
           </select>
         </div>
 
